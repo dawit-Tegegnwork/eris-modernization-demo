@@ -14,14 +14,14 @@ docker compose up --build
 
 | Service | URL |
 |---------|-----|
-| Frontend | http://localhost:5173 |
-| API | http://localhost:8000 |
-| API docs | http://localhost:8000/docs |
-| Health | http://localhost:8000/health |
+| Frontend | http://localhost:5180 |
+| API | http://localhost:8010 |
+| API docs | http://localhost:8010/docs |
+| Health | http://localhost:8010/health |
 
 ### Demo in 3 minutes
 
-1. Open http://localhost:5173
+1. Open http://localhost:5180
 2. Login as `reviewer@demo.local` / `Demo123!`
 3. View dashboard status counts
 4. Open Applications → pick up a submitted application

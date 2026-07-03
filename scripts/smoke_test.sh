@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-API_URL="${API_URL:-http://localhost:8000}"
+API_URL="${API_URL:-http://localhost:8010}"
 
 echo "==> Health check"
 curl -sf "$API_URL/health" | grep -q '"status":"ok"'

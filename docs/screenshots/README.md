@@ -10,5 +10,5 @@ Screenshots captured from the running demo. Replace with actual captures after `
 
 To capture:
 1. `docker compose up --build`
-2. Open http://localhost:5173
+2. Open http://localhost:5180 (Docker) or http://localhost:5173 (local dev)
 3. Login and navigate each page

@@ -17,7 +17,7 @@ bash scripts/smoke_test.sh
 - [ ] Login as `reviewer@demo.local` succeeds
 - [ ] Reviewer can pick up a submitted application
 - [ ] Login as `admin@demo.local` — audit log accessible
-- [ ] Frontend loads at http://localhost:5173
+- [ ] Frontend loads at http://localhost:5180 (Docker) or http://localhost:5173 (local dev)
 - [ ] Frontend login → dashboard → application detail works
 - [ ] `python scripts/validate_data.py` passes
 
