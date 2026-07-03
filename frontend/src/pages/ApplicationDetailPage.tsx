@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { api, type ApplicationDetail } from '../api/client';
+import { formatApiError } from '../api/errors';
 import { useAuth } from '../auth/AuthContext';
 import StatusBadge from '../components/StatusBadge';
 
@@ -24,7 +25,7 @@ export default function ApplicationDetailPage() {
 
   const load = () => {
     if (!id) return;
-    api.application(id).then(setApp).catch((e) => setError(e.message));
+    api.application(id).then(setApp).catch((e) => setError(formatApiError(e)));
   };
 
   useEffect(() => {
@@ -38,7 +39,7 @@ export default function ApplicationDetailPage() {
       setNote('');
       load();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Transition failed');
+      setError(formatApiError(err));
     }
   };
 
@@ -49,7 +50,7 @@ export default function ApplicationDetailPage() {
       setComment('');
       load();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Comment failed');
+      setError(formatApiError(err));
     }
   };
 
@@ -59,7 +60,7 @@ export default function ApplicationDetailPage() {
       await api.updateChecklist(id, itemId, received);
       load();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Checklist update failed');
+      setError(formatApiError(err));
     }
   };
 

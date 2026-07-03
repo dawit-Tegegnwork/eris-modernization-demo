@@ -1,6 +1,7 @@
 import { type FormEvent, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
+import { formatApiError } from '../api/errors';
 
 export default function LoginPage() {
   const { user, login } = useAuth();
@@ -18,7 +19,7 @@ export default function LoginPage() {
     try {
       await login(email, password);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Login failed');
+      setError(formatApiError(err));
     } finally {
       setLoading(false);
     }

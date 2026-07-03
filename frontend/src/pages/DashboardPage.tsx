@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { api, type DashboardSummary } from '../api/client';
+import { formatApiError } from '../api/errors';
 import { useAuth } from '../auth/AuthContext';
 
 export default function DashboardPage() {
@@ -9,7 +10,7 @@ export default function DashboardPage() {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    api.dashboard().then(setSummary).catch((e) => setError(e.message));
+    api.dashboard().then(setSummary).catch((e) => setError(formatApiError(e)));
   }, []);
 
   if (error) return <p className="error">{error}</p>;
@@ -45,7 +46,9 @@ export default function DashboardPage() {
         <h2>Quick actions</h2>
         <ul>
           <li><Link to="/applications">View all applications</Link></li>
-          {(user?.role === 'applicant' || user?.role === 'admin') && (
+          {(user?.role === 'applicant' ||
+            user?.role === 'admin' ||
+            user?.role === 'technical_reviewer') && (
             <li><Link to="/applications/new">Create new application</Link></li>
           )}
           {(user?.role === 'admin' || user?.role === 'auditor') && (

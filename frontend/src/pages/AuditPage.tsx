@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
 import { api, type AuditEvent } from '../api/client';
+import { formatApiError } from '../api/errors';
 
 export default function AuditPage() {
   const [events, setEvents] = useState<AuditEvent[]>([]);
   const [error, setError] = useState('');
 
   useEffect(() => {
-    api.audit().then(setEvents).catch((e) => setError(e.message));
+    api.audit().then(setEvents).catch((e) => setError(formatApiError(e)));
   }, []);
 
   if (error) return <p className="error">{error}</p>;

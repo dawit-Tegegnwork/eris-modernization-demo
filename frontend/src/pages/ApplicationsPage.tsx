@@ -1,6 +1,7 @@
-import { type FormEvent, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { api, type Application } from '../api/client';
+import { formatApiError } from '../api/errors';
 import { useAuth } from '../auth/AuthContext';
 import StatusBadge from '../components/StatusBadge';
 
@@ -25,13 +26,6 @@ export default function ApplicationsPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [apps, setApps] = useState<Application[]>([]);
   const [error, setError] = useState('');
-  const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState({
-    application_type: 'product_registration',
-    product_name: '',
-    applicant_org: user?.organization || '',
-    description: '',
-  });
 
   const statusFilter = searchParams.get('status') || '';
   const typeFilter = searchParams.get('type') || '';
@@ -40,80 +34,31 @@ export default function ApplicationsPage() {
     const params: { status?: string; application_type?: string } = {};
     if (statusFilter) params.status = statusFilter;
     if (typeFilter) params.application_type = typeFilter;
-    api.applications(params).then(setApps).catch((e) => setError(e.message));
+    api
+      .applications(params)
+      .then(setApps)
+      .catch((e) => setError(formatApiError(e)));
   };
 
   useEffect(() => {
     load();
   }, [statusFilter, typeFilter]);
 
-  const handleCreate = async (e: FormEvent) => {
-    e.preventDefault();
-    try {
-      await api.createApplication(form);
-      setShowForm(false);
-      setForm({ ...form, product_name: '', description: '' });
-      load();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Create failed');
-    }
-  };
-
-  const canCreate = user?.role === 'applicant' || user?.role === 'admin' || user?.role === 'technical_reviewer';
+  const canCreate =
+    user?.role === 'applicant' ||
+    user?.role === 'admin' ||
+    user?.role === 'technical_reviewer';
 
   return (
     <div>
       <div className="page-header">
         <h1>Regulatory Applications</h1>
         {canCreate && (
-          <button type="button" className="btn-primary" onClick={() => setShowForm(!showForm)}>
-            {showForm ? 'Cancel' : 'New Application'}
-          </button>
+          <Link to="/applications/new" className="btn-primary" style={{ textDecoration: 'none' }}>
+            New Application
+          </Link>
         )}
       </div>
-
-      {showForm && (
-        <form className="card form-card" onSubmit={handleCreate}>
-          <h2>Create Application</h2>
-          <label>
-            Type
-            <select
-              value={form.application_type}
-              onChange={(e) => setForm({ ...form, application_type: e.target.value })}
-            >
-              {APPLICATION_TYPES.map((t) => (
-                <option key={t} value={t}>{t.replace(/_/g, ' ')}</option>
-              ))}
-            </select>
-          </label>
-          <label>
-            Product name
-            <input
-              value={form.product_name}
-              onChange={(e) => setForm({ ...form, product_name: e.target.value })}
-              required
-            />
-          </label>
-          <label>
-            Applicant organization
-            <input
-              value={form.applicant_org}
-              onChange={(e) => setForm({ ...form, applicant_org: e.target.value })}
-              required
-            />
-          </label>
-          <label>
-            Description
-            <textarea
-              value={form.description}
-              onChange={(e) => setForm({ ...form, description: e.target.value })}
-              required
-              rows={3}
-            />
-          </label>
-          <button type="submit" className="btn-primary">Create draft</button>
-        </form>
-      )}
 
       <div className="filters">
         <select
@@ -127,7 +72,9 @@ export default function ApplicationsPage() {
         >
           <option value="">All statuses</option>
           {STATUSES.map((s) => (
-            <option key={s} value={s}>{s.replace(/_/g, ' ')}</option>
+            <option key={s} value={s}>
+              {s.replace(/_/g, ' ')}
+            </option>
           ))}
         </select>
         <select
@@ -141,7 +88,9 @@ export default function ApplicationsPage() {
         >
           <option value="">All types</option>
           {APPLICATION_TYPES.map((t) => (
-            <option key={t} value={t}>{t.replace(/_/g, ' ')}</option>
+            <option key={t} value={t}>
+              {t.replace(/_/g, ' ')}
+            </option>
           ))}
         </select>
       </div>
@@ -162,16 +111,24 @@ export default function ApplicationsPage() {
         <tbody>
           {apps.map((app) => (
             <tr key={app.id}>
-              <td><Link to={`/applications/${app.id}`}>{app.reference_number}</Link></td>
+              <td>
+                <Link to={`/applications/${app.id}`}>{app.reference_number}</Link>
+              </td>
               <td>{app.product_name}</td>
               <td>{app.application_type.replace(/_/g, ' ')}</td>
               <td>{app.applicant_org}</td>
-              <td><StatusBadge status={app.status} /></td>
-              <td>{app.submitted_at ? new Date(app.submitted_at).toLocaleDateString() : '—'}</td>
+              <td>
+                <StatusBadge status={app.status} />
+              </td>
+              <td>
+                {app.submitted_at ? new Date(app.submitted_at).toLocaleDateString() : '—'}
+              </td>
             </tr>
           ))}
           {apps.length === 0 && (
-            <tr><td colSpan={6}>No applications found.</td></tr>
+            <tr>
+              <td colSpan={6}>No applications found.</td>
+            </tr>
           )}
         </tbody>
       </table>

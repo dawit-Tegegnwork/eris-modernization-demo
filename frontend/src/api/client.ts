@@ -1,4 +1,6 @@
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+import { parseDetail } from './errors';
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8010';
 
 export type Role = 'applicant' | 'technical_reviewer' | 'admin' | 'auditor';
 
@@ -91,7 +93,7 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   const response = await fetch(`${API_URL}${path}`, { ...options, headers });
   if (!response.ok) {
     const body = await response.json().catch(() => ({}));
-    throw new Error(body.detail || `Request failed: ${response.status}`);
+    throw new Error(parseDetail(body.detail) || `Request failed: ${response.status}`);
   }
   return response.json();
 }
